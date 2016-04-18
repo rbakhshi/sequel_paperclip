@@ -1,7 +1,7 @@
 require 'rake'
 require 'rake/testtask'
-require 'rake/rdoctask'
-require 'rake/gempackagetask'
+require 'rdoc/task'
+require 'rubygems/package_task'
 
 $LOAD_PATH << File.join(File.dirname(__FILE__), 'lib')
 require 'sequel_paperclip'

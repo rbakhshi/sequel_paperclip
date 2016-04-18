@@ -11,11 +11,7 @@ Gem::Specification.new do |s|
   s.homepage          = "http://www.thoughtbot.com/, http://www.merboutpost.com"
   s.platform          = Gem::Platform::RUBY
   s.summary           = "File attachments as attributes for Merb + Sequel"
-  s.files             = FileList["README",
-                                 "LICENSE",
-                                 "Rakefile",
-                                 "init.rb",
-                                 "{generators,lib,tasks,test}/**/*"].to_a
+  s.files             = `git ls-files`.split("\n")
   s.require_path      = "lib"
   s.test_files        = FileList["test/**/test_*.rb"].to_a
   s.rubyforge_project = "sequel_paperclip"
