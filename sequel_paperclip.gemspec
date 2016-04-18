@@ -13,7 +13,7 @@ Gem::Specification.new do |s|
   s.summary           = "File attachments as attributes for Merb + Sequel"
   s.files             = `git ls-files`.split("\n")
   s.require_path      = "lib"
-  s.test_files        = FileList["test/**/test_*.rb"].to_a
+  s.test_files        = `git ls-files -- {test}/*`.split("\n")
   s.rubyforge_project = "sequel_paperclip"
   s.has_rdoc          = true
   s.extra_rdoc_files  = ["README"]
