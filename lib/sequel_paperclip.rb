@@ -186,11 +186,11 @@ module Paperclip
       self.attachment_definitions = {} if self.attachment_definitions.nil?
       self.attachment_definitions[name] = {:validations => []}.merge(options)
 
-      def after_save
+      define_method :after_save do
         save_attached_files
       end
 
-      def before_destroy
+      define_method :before_destroy do
         destroy_attached_files
       end
 
@@ -208,10 +208,6 @@ module Paperclip
 
       define_method "#{name}?" do
         attachment_for(name).file?
-      end
-
-      validates_each(name) do |record, attr, value|
-        value.send(:flush_errors) unless value.valid?
       end
     end
 
