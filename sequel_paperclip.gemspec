@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
-$:.push File.expand_path("../lib", __FILE__)
-require "sequel_paperclip/version"
+$LOAD_PATH << File.join(File.dirname(__FILE__), 'lib')
+require 'sequel_paperclip'
 
 Gem::Specification.new do |s| 
   s.rubygems_version  = "1.2.0"
