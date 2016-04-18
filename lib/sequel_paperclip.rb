@@ -181,12 +181,18 @@ module Paperclip
     #   for backend-specific options.
     def has_attached_file name, options = {}
       include InstanceMethods
+      include Resource
 
       self.attachment_definitions = {} if self.attachment_definitions.nil?
       self.attachment_definitions[name] = {:validations => []}.merge(options)
 
-      after_save :save_attached_files
-      before_destroy :destroy_attached_files
+      def after_save
+        save_attached_files
+      end
+
+      def before_destroy
+        destroy_attached_files
+      end
 
       define_method name do |*args|
         a = attachment_for(name)
