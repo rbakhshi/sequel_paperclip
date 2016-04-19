@@ -202,7 +202,7 @@ module Paperclip
       define_method "#{name}=" do |file|
         file = nil if file.is_a?(String) && file == ''
         # Transform Merb Mash to something what paperclip will understant
-        file = MashFile.new(file) if file.is_a?(Mash)
+        file = MashFile.new(file) if defined?(Mash) && file.is_a?(Mash)
         attachment_for(name).assign(file)
       end
 
