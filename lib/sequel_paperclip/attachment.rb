@@ -162,26 +162,39 @@ module Paperclip
     # style as arguments. This hash can be added to with your own proc if
     # necessary.
     def self.interpolations
-      @interpolations ||= {
-        :rails_root   => lambda{|attachment,style| Rails.root },
-        :rails_env    => lambda{|attachment,style| Rails.env },
-        :class        => lambda do |attachment,style|
-                           attachment.instance.class.name.underscore.pluralize
-                         end,
-        :basename     => lambda do |attachment,style|
-                           attachment.original_filename.gsub(/#{File.extname(attachment.original_filename)}$/, "")
-                         end,
-        :extension    => lambda do |attachment,style| 
-                           ((style = attachment.styles[style]) && style.last) ||
-                           File.extname(attachment.original_filename).gsub(/^\.+/, "")
-                         end,
-        :id           => lambda{|attachment,style| attachment.instance.id },
-        :id_partition => lambda do |attachment, style|
-                           ("%09d" % attachment.instance.id).scan(/\d{3}/).join("/")
-                         end,
-        :attachment   => lambda{|attachment,style| attachment.name.to_s.downcase.pluralize },
-        :style        => lambda{|attachment,style| style || attachment.default_style },
-      }
+      unless @interpolations
+        @interpolations = {
+            :rails_root   => lambda{|attachment,style| Rails.root },
+            :rails_env    => lambda{|attachment,style| Rails.env },
+            :class        => lambda do |attachment,style|
+              attachment.instance.class.name.underscore.pluralize
+            end,
+            :basename     => lambda do |attachment,style|
+              attachment.original_filename.gsub(/#{File.extname(attachment.original_filename)}$/, "")
+            end,
+            :extension    => lambda do |attachment,style|
+              ((style = attachment.styles[style]) && style.last) ||
+                  File.extname(attachment.original_filename).gsub(/^\.+/, "")
+            end,
+            :id           => lambda{|attachment,style| attachment.instance.id },
+            :id_partition => lambda do |attachment, style|
+              ("%09d" % attachment.instance.id).scan(/\d{3}/).join("/")
+            end,
+            :attachment   => lambda{|attachment,style| attachment.name.to_s.downcase.pluralize },
+            :style        => lambda{|attachment,style| style || attachment.default_style },
+        }
+
+        # merge any cusotm interpolations
+        if defined? Paperclip::Interpolations
+          customizations = Class.new do
+            include Paperclip::Interpolations
+          end.new
+          Paperclip::Interpolations.instance_methods.each do |method|
+            @interpolations[method] = customizations.method method
+          end
+        end
+      end
+      @interpolations
     end
 
     # This method really shouldn't be called that often. It's expected use is in the
