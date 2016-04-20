@@ -172,6 +172,9 @@ module Paperclip
             :basename     => lambda do |attachment,style|
               attachment.original_filename.gsub(/#{File.extname(attachment.original_filename)}$/, "")
             end,
+            :filename     => lambda do |attachment,style|
+              File.basename attachment.original_filename
+            end,
             :extension    => lambda do |attachment,style|
               ((style = attachment.styles[style]) && style.last) ||
                   File.extname(attachment.original_filename).gsub(/^\.+/, "")
