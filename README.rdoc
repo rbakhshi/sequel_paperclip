@@ -73,7 +73,7 @@ Simply add your own interplators like:
     end
   end
   
-  # now you can have :my_value a your path parameter
+  # now you can have :my_value as your path parameter
   
   
 ==Contributing
