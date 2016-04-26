@@ -90,9 +90,8 @@ module Paperclip
       validate
     end
 
-    alias_method :rails_blank?, :blank?
     def blank?
-      rails_blank? || instance_read(:file_name).blank?
+      instance_read(:file_name).blank?
     end
 
     # Returns the public URL of the attachment, with a given style. Note that this
