@@ -2,16 +2,16 @@ module Paperclip
   # The Attachment class manages the files for a given attachment. It saves when the model saves,
   # deletes when the model is destroyed, and processes the file upon assignment.
   class Attachment
-    
+
     def self.default_options
       @default_options ||= {
-        :url           => "/:attachment/:id/:style/:basename.:extension",
-        :path          => ":rails_root/public/:attachment/:id/:style/:basename.:extension",
-        :styles        => {},
-        :default_url   => "/:attachment/:style/missing.png",
-        :default_style => :original,
-        :validations   => [],
-        :storage       => :filesystem
+          :url => "/:attachment/:id/:style/:basename.:extension",
+          :path => ":rails_root/public/:attachment/:id/:style/:basename.:extension",
+          :styles => {},
+          :default_url => "/:attachment/:style/missing.png",
+          :default_style => :original,
+          :validations => [],
+          :storage => :filesystem
       }
     end
 
@@ -21,26 +21,26 @@ module Paperclip
     # ActiveRecord object instance it's attached to, and +options+ is the same as the hash
     # passed to +has_attached_file+.
     def initialize name, instance, options = {}
-      @name              = name
-      @instance          = instance
+      @name = name
+      @instance = instance
 
       options = self.class.default_options.merge(options)
 
-      @url               = options[:url]
-      @path              = options[:path]
-      @styles            = options[:styles]
-      @default_url       = options[:default_url]
-      @validations       = options[:validations]
-      @default_style     = options[:default_style]
-      @storage           = options[:storage]
-      @whiny_thumbnails  = options[:whiny_thumbnails]
-      @convert_options   = options[:convert_options] || {}
-      @options           = options
+      @url = options[:url]
+      @path = options[:path]
+      @styles = options[:styles]
+      @default_url = options[:default_url]
+      @validations = options[:validations]
+      @default_style = options[:default_style]
+      @storage = options[:storage]
+      @whiny_thumbnails = options[:whiny_thumbnails]
+      @convert_options = options[:convert_options] || {}
+      @options = options
       @queued_for_delete = []
-      @queued_for_write  = {}
-      @errors            = []
+      @queued_for_write = {}
+      @errors = []
       @validation_errors = nil
-      @dirty             = false
+      @dirty = false
 
       normalize_style_definition
       initialize_storage
@@ -68,22 +68,28 @@ module Paperclip
       logger.info("[paperclip] Assigning #{uploaded_file.inspect} to #{name}")
 
       queue_existing_for_delete
-      @errors            = []
+      @errors = []
       @validation_errors = nil
 
       return nil if uploaded_file.nil?
 
       logger.info("[paperclip] Writing attributes for #{name}")
-      @queued_for_write[:original]   = uploaded_file.tempfile
-      instance_write(:file_name,       uploaded_file.original_filename.strip.gsub(/[^\w\d\.\-]+/, '_'))
-      instance_write(:content_type,    uploaded_file.content_type.strip)
-      instance_write(:file_size,       uploaded_file.size.to_i)
-      instance_write(:updated_at,      Time.now)
+      @queued_for_write[:original] = if uploaded_file.respond_to?(:tempfile)
+                                       uploaded_file.tempfile
+                                     elsif uploaded_file.respond_to?(:to_tempfile)
+                                        uploaded_file.to_tempfile
+                                     else
+                                       uploaded_file
+                                     end
+      instance_write(:file_name, uploaded_file.original_filename.strip.gsub(/[^\w\d\.\-]+/, '_'))
+      instance_write(:content_type, uploaded_file.content_type.strip)
+      instance_write(:file_size, uploaded_file.size.to_i)
+      instance_write(:updated_at, Time.now)
 
       @dirty = true
 
       post_process
- 
+
       # Reset the file size if the original file was reprocessed.
       instance_write(:file_size, uploaded_file.size.to_i)
     ensure
@@ -154,7 +160,7 @@ module Paperclip
     def original_filename
       instance_read(:file_name)
     end
-    
+
     def updated_at
       time = instance_read(:updated_at)
       time && time.to_i
@@ -168,27 +174,27 @@ module Paperclip
     def self.interpolations
       unless @interpolations
         @interpolations = {
-            :rails_root   => lambda{|attachment,style| Rails.root },
-            :rails_env    => lambda{|attachment,style| Rails.env },
-            :class        => lambda do |attachment,style|
+            :rails_root => lambda { |attachment, style| Rails.root },
+            :rails_env => lambda { |attachment, style| Rails.env },
+            :class => lambda do |attachment, style|
               attachment.instance.class.name.underscore.pluralize
             end,
-            :basename     => lambda do |attachment,style|
+            :basename => lambda do |attachment, style|
               attachment.original_filename.gsub(/#{File.extname(attachment.original_filename)}$/, "")
             end,
-            :filename     => lambda do |attachment,style|
+            :filename => lambda do |attachment, style|
               File.basename attachment.original_filename
             end,
-            :extension    => lambda do |attachment,style|
+            :extension => lambda do |attachment, style|
               ((style = attachment.styles[style]) && style.last) ||
                   File.extname(attachment.original_filename).gsub(/^\.+/, "")
             end,
-            :id           => lambda{|attachment,style| attachment.instance.id },
+            :id => lambda { |attachment, style| attachment.instance.id },
             :id_partition => lambda do |attachment, style|
               ("%09d" % attachment.instance.id).scan(/\d{3}/).join("/")
             end,
-            :attachment   => lambda{|attachment,style| attachment.name.to_s.downcase.pluralize },
-            :style        => lambda{|attachment,style| style || attachment.default_style },
+            :attachment => lambda { |attachment, style| attachment.name.to_s.downcase.pluralize },
+            :style => lambda { |attachment, style| style || attachment.default_style },
         }
 
         # merge any cusotm interpolations
@@ -211,10 +217,10 @@ module Paperclip
     def reprocess!
       new_original = Tempfile.new("paperclip-reprocess")
       if old_original = to_file(:original)
-        new_original.write( old_original.read )
+        new_original.write(old_original.read)
         new_original.rewind
 
-        @queued_for_write = { :original => new_original }
+        @queued_for_write = {:original => new_original}
         post_process
 
         old_original.close if old_original.respond_to?(:close)
@@ -224,7 +230,7 @@ module Paperclip
         true
       end
     end
-    
+
     def file?
       !original_filename.blank?
     end
@@ -260,8 +266,8 @@ module Paperclip
     def normalize_style_definition
       @styles.each do |name, args|
         dimensions, format = [args, nil].flatten[0..1]
-        format             = nil if format == ""
-        @styles[name]      = [dimensions, format]
+        format = nil if format == ""
+        @styles[name] = [dimensions, format]
       end
     end
 
@@ -271,7 +277,7 @@ module Paperclip
     end
 
     def extra_options_for(style) #:nodoc:
-      [ convert_options[style], convert_options[:all] ].compact.join(" ")
+      [convert_options[style], convert_options[:all]].compact.join(" ")
     end
 
     def post_process #:nodoc:
@@ -281,9 +287,9 @@ module Paperclip
         begin
           dimensions, format = args
           dimensions = dimensions.call(instance) if dimensions.respond_to? :call
-          @queued_for_write[name] = Thumbnail.make(@queued_for_write[:original], 
+          @queued_for_write[name] = Thumbnail.make(@queued_for_write[:original],
                                                    dimensions,
-                                                   format, 
+                                                   format,
                                                    extra_options_for(name),
                                                    @whiny_thumbnails)
         rescue PaperclipError => e
@@ -293,11 +299,11 @@ module Paperclip
     end
 
     def interpolate pattern, style = default_style #:nodoc:
-      interpolations = self.class.interpolations.sort{|a,b| a.first.to_s <=> b.first.to_s }
-      interpolations.reverse.inject( pattern.dup ) do |result, interpolation|
+      interpolations = self.class.interpolations.sort { |a, b| a.first.to_s <=> b.first.to_s }
+      interpolations.reverse.inject(pattern.dup) do |result, interpolation|
         tag, blk = interpolation
         result.gsub(/:#{tag}/) do |match|
-          blk.call( self, style )
+          blk.call(self, style)
         end
       end
     end
