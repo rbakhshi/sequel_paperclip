@@ -249,11 +249,10 @@ module Paperclip
     end
 
     def validate #:nodoc:
-        @validation_errors = @validations.collect do |v|
-          v.call(self, instance)
-        end.flatten.compact.uniq
-        @errors += @validation_errors
-      end
+      @validation_errors = @validations.collect do |v|
+        v.call(self, instance)
+      end.flatten.compact.uniq
+      @errors += @validation_errors
       @validation_errors
     end
 
