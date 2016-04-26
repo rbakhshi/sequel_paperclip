@@ -147,6 +147,8 @@ module Paperclip
       flush_deletes
       flush_writes
       @dirty = false
+      @errors = []
+      @validation_errors = nil
       true
     end
 
@@ -249,10 +251,12 @@ module Paperclip
     end
 
     def validate #:nodoc:
-      @validation_errors = @validations.collect do |v|
-        v.call(self, instance)
-      end.flatten.compact.uniq
-      @errors += @validation_errors
+      unless @validation_errors
+        @validation_errors = @validations.collect do |v|
+          v.call(self, instance)
+        end.flatten.compact.uniq
+        @errors += @validation_errors
+      end
       @validation_errors
     end
 
