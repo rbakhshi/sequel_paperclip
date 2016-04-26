@@ -77,7 +77,7 @@ module Paperclip
       @queued_for_write[:original] = if uploaded_file.respond_to?(:tempfile)
                                        uploaded_file.tempfile
                                      elsif uploaded_file.respond_to?(:to_tempfile)
-                                        uploaded_file.to_tempfile
+                                       uploaded_file.to_tempfile
                                      else
                                        uploaded_file
                                      end
@@ -142,17 +142,12 @@ module Paperclip
     # Saves the file, if there are no errors. If there are, it flushes them to
     # the instance's errors and returns false, cancelling the save.
     def save
-      if valid?
-        logger.info("[paperclip] Saving files for #{name}")
-        flush_deletes
-        flush_writes
-        @dirty = false
-        true
-      else
-        logger.info("[paperclip] Errors on #{name}. Not saving.")
-        flush_errors
-        false
-      end
+      logger.info("[paperclip] Saving files for #{name}")
+      logger.warn "[paperclip] Saving an invalid #{name}!" if valid?
+      flush_deletes
+      flush_writes
+      @dirty = false
+      true
     end
 
     # Returns the name of the file as originally assigned, and as lives in the
