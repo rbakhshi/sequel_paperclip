@@ -325,7 +325,7 @@ module Paperclip
     
     # Sequel stores loggers in DB
     def logger
-      self.db.loggers.first
+      self.db.loggers.first || Logger.new($stdout)
     end
   end
 
